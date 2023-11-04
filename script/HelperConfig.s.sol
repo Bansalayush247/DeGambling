@@ -23,14 +23,13 @@ contract HelperConfig is Script {
     }
 
     function getMumbaiEthConfig() public view returns (NetworkConfig memory) {
-        return
-            NetworkConfig({
-                vrfCoordinator: 0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed,
-                keyHash: 0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f,
-                subscriptionId: 6389,
-                callbackGasLimit: 500000,
-                link: 0x326C977E6efc84E512bB9C30f76E30c160eD06FB,
-                deployerKey: vm.envUint("PRIVATE_KEY")
-            });
+        return NetworkConfig({
+            vrfCoordinator: 0x7a1BaC17Ccc5b313516C5E16fb24f7659aA5ebed,
+            keyHash: 0x4b09e658ed251bcafeebbc69400383d49f344ace09b9576fe248bb02c003fe9f,
+            subscriptionId: 6389,
+            callbackGasLimit: 500000,
+            link: 0x326C977E6efc84E512bB9C30f76E30c160eD06FB,
+            deployerKey: vm.envUint("PRIVATE_KEY")
+        });
     }
 }

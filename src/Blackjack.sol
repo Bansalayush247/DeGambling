@@ -50,12 +50,9 @@ contract Blackjack is VRFConsumerBaseV2 {
         _;
     }
 
-    constructor(
-        address vrfCoordinator,
-        bytes32 keyHash,
-        uint64 subscriptionId,
-        uint32 callbackGasLimit
-    ) VRFConsumerBaseV2(vrfCoordinator) {
+    constructor(address vrfCoordinator, bytes32 keyHash, uint64 subscriptionId, uint32 callbackGasLimit)
+        VRFConsumerBaseV2(vrfCoordinator)
+    {
         token = new Token();
         i_vrfCoordinator = VRFCoordinatorV2Interface(vrfCoordinator);
         i_keyHash = keyHash;
@@ -100,40 +97,33 @@ contract Blackjack is VRFConsumerBaseV2 {
         players[msg.sender].inGame = true;
         deal();
         deal();
+        
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
-            i_keyHash,
-            i_subscriptionId,
-            REQUEST_CONFIRMATIONS,
-            i_callbackGasLimit,
-            NUM_WORDS
+            i_keyHash, i_subscriptionId, REQUEST_CONFIRMATIONS, i_callbackGasLimit, NUM_WORDS
         );
         ownerCardsByUser[msg.sender] = recentRandomNumber;
     }
 
     function deal() public onlyWhenInGame(msg.sender) {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
-            i_keyHash,
-            i_subscriptionId,
-            REQUEST_CONFIRMATIONS,
-            i_callbackGasLimit,
-            NUM_WORDS
+            i_keyHash, i_subscriptionId, REQUEST_CONFIRMATIONS, i_callbackGasLimit, NUM_WORDS
         );
         players[msg.sender].cards.push(recentRandomNumber);
         players[msg.sender].sum += recentRandomNumber;
         _checkIfBust(msg.sender);
     }
 
-    function hit() external onlyWhenInGame(msg.sender){
+    function hit() external onlyWhenInGame(msg.sender) {
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
-            i_keyHash,
-            i_subscriptionId,
-            REQUEST_CONFIRMATIONS,
-            i_callbackGasLimit,
-            NUM_WORDS
+            i_keyHash, i_subscriptionId, REQUEST_CONFIRMATIONS, i_callbackGasLimit, NUM_WORDS
         );
         players[msg.sender].inGame = false;
         if (ownerCardsByUser[msg.sender] + recentRandomNumber > players[msg.sender].sum) {
             bool ok = token.transfer(msg.sender, (players[msg.sender].amount * 150) / 100);
+
+            if (!ok) {
+                revert TransferedFailed();
+            }
         }
     }
 
@@ -150,10 +140,7 @@ contract Blackjack is VRFConsumerBaseV2 {
         }
     }
 
-    function fulfillRandomWords(
-        uint256 /*requestId*/,
-        uint256[] memory randomWords
-    ) internal override {
+    function fulfillRandomWords(uint256, /*requestId*/ uint256[] memory randomWords) internal override {
         recentRandomNumber = randomWords[0] % 14;
     }
 
@@ -169,7 +156,7 @@ contract Blackjack is VRFConsumerBaseV2 {
         return players[player];
     }
 
-    function getOwnerCardsByUser(address player) external view returns (uint) {
+    function getOwnerCardsByUser(address player) external view returns (uint256) {
         return ownerCardsByUser[player];
     }
 }
