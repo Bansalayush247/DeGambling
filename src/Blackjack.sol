@@ -94,10 +94,11 @@ contract Blackjack is VRFConsumerBaseV2 {
         if (!ok) {
             revert TransferedFailed();
         }
+        players[msg.sender].amount = amount;
         players[msg.sender].inGame = true;
         deal();
         deal();
-        
+
         uint256 requestId = i_vrfCoordinator.requestRandomWords(
             i_keyHash, i_subscriptionId, REQUEST_CONFIRMATIONS, i_callbackGasLimit, NUM_WORDS
         );
